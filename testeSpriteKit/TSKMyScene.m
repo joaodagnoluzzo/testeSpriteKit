@@ -10,8 +10,9 @@
 
 
 static const uint32_t WORLD = 0x1 << 0;
-static const uint32_t SHAPE = 0x1 << 1;
-static const uint32_t PADDLE = 0x1 << 2;
+static const uint32_t GROUND = 0x1 << 1;
+static const uint32_t SHAPE = 0x1 << 2;
+static const uint32_t PADDLE = 0x1 << 3;
 
 
 static NSString* shapeCategoryName = @"shape";
@@ -48,7 +49,7 @@ static NSString* paddleCategoryName = @"paddle";
         self.physicsBody.categoryBitMask = WORLD;
         //NSLog(@"%u", self.physicsBody.categoryBitMask);
         
-        self.physicsBody.collisionBitMask = SHAPE | WORLD;
+        self.physicsBody.collisionBitMask = SHAPE | GROUND;
         self.physicsBody.contactTestBitMask = SHAPE;
         
         self.physicsBody = [SKPhysicsBody bodyWithEdgeLoopFromRect:self.frame];
@@ -114,9 +115,10 @@ static NSString* paddleCategoryName = @"paddle";
     
     [self addChild:self.balls_number];
     
+    
+    [self addGround];
+    
     [self addPaddle];
-    
-    
 }
 
 -(void)addPaddle{
@@ -174,8 +176,8 @@ static NSString* paddleCategoryName = @"paddle";
     shape.strokeColor = [SKColor blackColor];
     
     shape.physicsBody.categoryBitMask = SHAPE;
-    shape.physicsBody.collisionBitMask = SHAPE| PADDLE | WORLD;
-    shape.physicsBody.contactTestBitMask = SHAPE | PADDLE | WORLD;
+    shape.physicsBody.collisionBitMask = SHAPE| PADDLE | GROUND;
+    shape.physicsBody.contactTestBitMask = SHAPE | GROUND | PADDLE ;
     
     shape.physicsBody.restitution = 1; //bouncing
     shape.physicsBody.linearDamping = 0; //reduces linear velocity
@@ -183,6 +185,30 @@ static NSString* paddleCategoryName = @"paddle";
     
     [self addChild:shape];
     self.qtdShapes += 1;
+}
+
+
+-(void)addGround{
+    
+    SKShapeNode *ground = [[SKShapeNode alloc] init];
+    NSInteger groundWidth = self.view.frame.size.width;
+    NSInteger groundHeight = 50;
+    
+    CGMutablePathRef myPath = CGPathCreateMutable();
+    CGPathAddRect(myPath, NULL, CGRectMake(-(groundWidth/2), -(groundHeight/2), groundWidth, groundHeight));
+    
+    ground.position = CGPointMake((groundWidth/2), groundHeight/2);
+    ground.path = myPath;
+    ground.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize: CGSizeMake(groundWidth, groundHeight)];
+    
+    ground.physicsBody.categoryBitMask = GROUND;
+    ground.physicsBody.collisionBitMask = SHAPE;
+    ground.physicsBody.contactTestBitMask = SHAPE;
+    ground.physicsBody.dynamic = NO;
+    
+    
+    
+    [self addChild:ground];
 }
 
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
@@ -295,7 +321,7 @@ static NSString* paddleCategoryName = @"paddle";
             secondBody = contact.bodyA;
         }
         
-        if(secondBody.categoryBitMask > firstBody.categoryBitMask && secondBody.categoryBitMask != PADDLE){
+        if(secondBody.categoryBitMask > firstBody.categoryBitMask && secondBody.categoryBitMask == GROUND){
             
 //            NSLog(@"WORLD> %u %u",secondBody.categoryBitMask,WORLD);
 //            NSLog(@"SHAPE> %u %u",firstBody.categoryBitMask,SHAPE);
@@ -323,7 +349,7 @@ static NSString* paddleCategoryName = @"paddle";
 -(void)didEndContact:(SKPhysicsContact *)contact{
     
     
-    NSLog(@"contact!");
+    //NSLog(@"contact!");
     
     
 }
