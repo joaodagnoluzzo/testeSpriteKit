@@ -23,6 +23,7 @@
 		CF9573DD18D76F7500C05722 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CF9573B818D76F7500C05722 /* UIKit.framework */; };
 		CF9573E518D76F7500C05722 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = CF9573E318D76F7500C05722 /* InfoPlist.strings */; };
 		CF9573E718D76F7500C05722 /* testeSpriteKitTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CF9573E618D76F7500C05722 /* testeSpriteKitTests.m */; };
+		CFDE77E719633EB6006BDA5C /* spikes.png in Resources */ = {isa = PBXBuildFile; fileRef = CFDE77E619633EB6006BDA5C /* spikes.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -58,6 +59,7 @@
 		CF9573E218D76F7500C05722 /* testeSpriteKitTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "testeSpriteKitTests-Info.plist"; sourceTree = "<group>"; };
 		CF9573E418D76F7500C05722 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		CF9573E618D76F7500C05722 /* testeSpriteKitTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = testeSpriteKitTests.m; sourceTree = "<group>"; };
+		CFDE77E619633EB6006BDA5C /* spikes.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spikes.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -165,8 +167,17 @@
 		CF9573F018D779B700C05722 /* iPad */ = {
 			isa = PBXGroup;
 			children = (
+				CFDE77E519633EA4006BDA5C /* Images */,
 			);
 			name = iPad;
+			sourceTree = "<group>";
+		};
+		CFDE77E519633EA4006BDA5C /* Images */ = {
+			isa = PBXGroup;
+			children = (
+				CFDE77E619633EB6006BDA5C /* spikes.png */,
+			);
+			name = Images;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -246,6 +257,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CFDE77E719633EB6006BDA5C /* spikes.png in Resources */,
 				CF9573C118D76F7500C05722 /* InfoPlist.strings in Resources */,
 				CF9573D418D76F7500C05722 /* Images.xcassets in Resources */,
 				CF9573CA18D76F7500C05722 /* Main.storyboard in Resources */,
