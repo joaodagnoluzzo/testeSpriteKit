@@ -23,6 +23,7 @@ static NSString* paddleCategoryName = @"paddle";
 
 @property (nonatomic) BOOL isFingerOnPaddle;
 @property (nonatomic) BOOL isFinderOnSecondaryPaddle;
+@property (nonatomic) BOOL gameStarted, isPaused;
 @property NSInteger paddleHeight, paddleWidth, qtdShapes, userPoints;
 @property SKLabelNode *points_hud, *balls_number;
 
@@ -44,7 +45,8 @@ static NSString* paddleCategoryName = @"paddle";
         /* Setup your scene here */
         
         firstTouch = NO;
-        
+        self.gameStarted = NO;
+        self.isPaused = NO;
         //self.backgroundColor = [SKColor colorWithRed:0.15 green:0.15 blue:0.3 alpha:1.0];
         self.backgroundColor = [SKColor colorWithRed:1-0.15 green:1-0.15 blue:1-0.3 alpha:1.0];
         
@@ -246,6 +248,8 @@ static NSString* paddleCategoryName = @"paddle";
     
     [self addChild:shape];
     self.qtdShapes += 1;
+    self.gameStarted = YES;
+    
 }
 
 
@@ -289,7 +293,10 @@ static NSString* paddleCategoryName = @"paddle";
 }
 
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
-    
+//    
+//    if(self.isPaused)
+//        return;
+//    
     if(firstTouch == NO){
         [self addEnvironment];
     }
@@ -506,10 +513,21 @@ static NSString* paddleCategoryName = @"paddle";
     //NSLog(@"contact!");
 }
 
+
+-(void)gameOver{
+    NSLog(@"GAME FKING OVER!");
+    [self.scene setPaused:YES];
+    self.isPaused = YES;
+}
+
 -(void)update:(CFTimeInterval)currentTime {
     /* Called before each frame is rendered */
     if(firstTouch){
         [waitingForTouch removeFromParent];
+    }
+    
+    if(self.gameStarted && self.qtdShapes <=0){
+        [self gameOver];
     }
     
     self.points_hud.text = [NSString stringWithFormat:@"Score: %li", (long)self.userPoints];
