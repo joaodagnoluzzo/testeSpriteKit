@@ -103,7 +103,7 @@ static NSString* paddleCategoryName = @"paddle";
     
     
     self.points_hud = [[SKLabelNode alloc] initWithFontNamed:@"Chalkduster"];
-    self.points_hud.text = [NSString stringWithFormat:@"Score: %i", self.userPoints];
+    self.points_hud.text = [NSString stringWithFormat:@"Score: %li", (long)self.userPoints];
     self.points_hud.fontSize = 30;
     self.points_hud.position = CGPointMake(CGRectGetMidX(self.frame),
                                            CGRectGetMidY(self.frame)*1/3 -10);
@@ -112,7 +112,7 @@ static NSString* paddleCategoryName = @"paddle";
     [self addChild:self.points_hud];
     
     self.balls_number = [[SKLabelNode alloc] initWithFontNamed:@"Chalkduster"];
-    self.balls_number.text = [NSString stringWithFormat:@"Number of balls: %i", self.qtdShapes];
+    self.balls_number.text = [NSString stringWithFormat:@"Number of balls: %li", (long)self.qtdShapes];
     self.balls_number.fontSize = 30;
     self.balls_number.position = CGPointMake(CGRectGetMidX(self.frame),
                                            CGRectGetMidY(self.frame)*1/3 -50);
@@ -125,7 +125,7 @@ static NSString* paddleCategoryName = @"paddle";
     
     [self addPaddle];
     
-    //[self addSecondaryPaddle];
+    [self addSecondaryPaddle];
 }
 
 -(void)addPaddle{
@@ -138,7 +138,7 @@ static NSString* paddleCategoryName = @"paddle";
     
     paddle.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:CGSizeMake(self.paddleWidth, self.paddleHeight)];
     
-    paddle.position = CGPointMake(self.frame.size.width/2, self.frame.size.height/5);
+    paddle.position = CGPointMake(self.frame.size.width/2 + self.paddleWidth, self.frame.size.height/5);
     
     paddle.physicsBody.dynamic = NO;
     
@@ -150,7 +150,7 @@ static NSString* paddleCategoryName = @"paddle";
     
     [self addChild:paddle];
     
-    SKSpriteNode *placeholder = [[SKSpriteNode alloc] initWithColor:[SKColor redColor] size:CGSizeMake(self.paddleWidth, self.paddleWidth)];
+    SKSpriteNode *placeholder = [[SKSpriteNode alloc] initWithColor:[SKColor clearColor] size:CGSizeMake(self.paddleWidth, self.paddleWidth)];
     
     placeholder.name = @"mainPlaceholder";
     
@@ -181,7 +181,7 @@ static NSString* paddleCategoryName = @"paddle";
     paddle.name = paddleCategoryName;
     paddle.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:CGSizeMake(self.paddleWidth, self.paddleHeight)];
     
-    paddle.position = CGPointMake(self.frame.size.width/2, self.frame.size.height/5);
+    paddle.position = CGPointMake(self.frame.size.width/4, self.frame.size.height/5);
     
     paddle.physicsBody.dynamic = NO;
     
@@ -195,7 +195,7 @@ static NSString* paddleCategoryName = @"paddle";
     [self addChild:paddle];
     
     
-    SKSpriteNode *placeholder = [[SKSpriteNode alloc] initWithColor:[SKColor redColor] size:CGSizeMake(self.paddleWidth, self.paddleWidth)];
+    SKSpriteNode *placeholder = [[SKSpriteNode alloc] initWithColor:[SKColor clearColor] size:CGSizeMake(self.paddleWidth, self.paddleWidth)];
     
     placeholder.name = @"secondaryPlaceholder";
     
@@ -298,19 +298,19 @@ static NSString* paddleCategoryName = @"paddle";
     /* Called when a touch begins */
     UITouch* touch = [touches anyObject];
     CGPoint touchLocation = [touch locationInNode:self];
-    
-    SKPhysicsBody* body = [self.physicsWorld bodyAtPoint:touchLocation];
-        NSLog(@">> %@",body.node.name);
+        SKNode *aux = [self nodeAtPoint:touchLocation];
+//    SKPhysicsBody* body = [self.physicsWorld bodyAtPoint:touchLocation];
+//        NSLog(@">> %@",body.node.name);
         
-    if (body) {
-        if([body.node.name isEqualToString:@"mainPaddle"] || [body.node.name isEqualToString:@"mainPlaceholder"]){
+    if (aux) {
+        if([aux.name isEqualToString:@"mainPaddle"] || [aux.name isEqualToString:@"mainPlaceholder"]){
             NSLog(@"Began touch on main paddle");
             self.isFingerOnPaddle = YES;
-        }else if([body.node.name isEqualToString:@"secondaryPaddle"] || [body.node.name isEqualToString:@"secondaryPlaceholder"]){
+        }else if([aux.name isEqualToString:@"secondaryPaddle"] || [aux.name isEqualToString:@"secondaryPlaceholder"]){
             NSLog(@"Began touch on secondary paddle");
             self.isFinderOnSecondaryPaddle = YES;
         }
-        NSLog(@"%hhd %hhd", self.isFingerOnPaddle, self.isFinderOnSecondaryPaddle);
+    //    NSLog(@"%hhd %hhd", self.isFingerOnPaddle, self.isFinderOnSecondaryPaddle);
     }
     }
 
@@ -374,20 +374,36 @@ static NSString* paddleCategoryName = @"paddle";
     
     for(UITouch *touch in array){
         
-        if(self.isFingerOnPaddle || self.isFinderOnSecondaryPaddle){
-//            UITouch* touch = [touches anyObject];
+        if(self.isFingerOnPaddle){
+            //UITouch* touch = [touches anyObject];
             CGPoint touchLocation = [touch locationInNode:self];
             CGPoint previousLocation = [touch previousLocationInNode:self];
             // 3 Get node for paddle
             SKNode* aux = [self nodeAtPoint:touchLocation];
             NSLog(@"%@", aux.name);
-            if(aux){
-            SKShapeNode* paddle = (SKShapeNode*)[self nodeAtPoint:touchLocation];
-            // 4 Calculate new position along x for paddle
-            int paddleX = paddle.position.x + (touchLocation.x - previousLocation.x);
-            int paddleY = paddle.position.y + (touchLocation.y - previousLocation.y);
-            // 6 Update position of paddle
-            paddle.position = CGPointMake(paddleX, paddleY);
+            if(aux && [aux.name isEqualToString:@"mainPlaceholder"]){
+                SKShapeNode* paddle = (SKShapeNode*)self.mainPaddle;
+                // 4 Calculate new position along x for paddle
+                int paddleX = paddle.position.x + (touchLocation.x - previousLocation.x);
+                int paddleY = paddle.position.y + (touchLocation.y - previousLocation.y);
+                // 6 Update position of paddle
+                paddle.position = CGPointMake(paddleX, paddleY);
+            }
+        }
+        if(self.isFinderOnSecondaryPaddle){
+            //UITouch* touch = [touches anyObject];
+            CGPoint touchLocation = [touch locationInNode:self];
+            CGPoint previousLocation = [touch previousLocationInNode:self];
+            // 3 Get node for paddle
+            SKNode* aux = [self nodeAtPoint:touchLocation];
+            NSLog(@"%@", aux.name);
+            if(aux && [aux.name isEqualToString:@"secondaryPlaceholder"]){
+                SKShapeNode* paddle = (SKShapeNode*)self.secondaryPaddle;
+                // 4 Calculate new position along x for paddle
+                int paddleX = paddle.position.x + (touchLocation.x - previousLocation.x);
+                int paddleY = paddle.position.y + (touchLocation.y - previousLocation.y);
+                // 6 Update position of paddle
+                paddle.position = CGPointMake(paddleX, paddleY);
             }
         }
     }
@@ -395,10 +411,6 @@ static NSString* paddleCategoryName = @"paddle";
 
 }
 
-    
-    
-    
-    
 //    for(UITouch *touch in array){
 //    dispatch_queue_t myQueue = dispatch_queue_create("myQueue", nil);
 //    
@@ -424,8 +436,6 @@ static NSString* paddleCategoryName = @"paddle";
 //    }
 //    
 
-
-
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event{
     
     [super touchesMoved:touches withEvent:event];
@@ -434,9 +444,9 @@ static NSString* paddleCategoryName = @"paddle";
     CGPoint currentPosition = [touch locationInView:self.view];
     
     SKNode *node = [self nodeAtPoint:currentPosition];
-    if([node.name isEqualToString:@"mainPaddle"]){
+    if([node.name isEqualToString:@"mainPaddle"] || [node.name isEqualToString:@"mainPlaceholder"]){
         self.isFingerOnPaddle = NO;
-    }else if([node.name isEqualToString:@"secondaryPaddle"]){
+    }else if([node.name isEqualToString:@"secondaryPaddle"] || [node.name isEqualToString:@"secondaryPlaceholder"]){
         self.isFinderOnSecondaryPaddle = NO;
     }
 }
@@ -468,7 +478,12 @@ static NSString* paddleCategoryName = @"paddle";
             SKAction *fadeOut = [SKAction fadeOutWithDuration:0.5f];
             SKAction *remove = [SKAction removeFromParent];
             SKAction *block = [SKAction runBlock:^{
-                self.qtdShapes-= 1;
+                if(self.qtdShapes-1<0){
+                    self.qtdShapes = 0;
+                }
+                else{
+                    self.qtdShapes-= 1;
+                }
             }];
             [firstBody.node runAction:[SKAction sequence:@[fadeOut,block,remove]]];
             
@@ -497,8 +512,8 @@ static NSString* paddleCategoryName = @"paddle";
         [waitingForTouch removeFromParent];
     }
     
-    self.points_hud.text = [NSString stringWithFormat:@"Score: %i", self.userPoints];
-    self.balls_number.text = [NSString stringWithFormat:@"Number of balls: %i", self.qtdShapes];
+    self.points_hud.text = [NSString stringWithFormat:@"Score: %li", (long)self.userPoints];
+    self.balls_number.text = [NSString stringWithFormat:@"Number of balls: %li", (long)self.qtdShapes];
 }
 
 
