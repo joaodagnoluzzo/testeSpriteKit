@@ -26,7 +26,6 @@ static NSString* paddleCategoryName = @"paddle";
 @property (nonatomic) BOOL gameStarted, isPaused;
 @property NSInteger paddleHeight, paddleWidth, qtdShapes, userPoints;
 @property SKLabelNode *points_hud, *balls_number;
-
 @property SKShapeNode *mainPaddle, *secondaryPaddle;
 @property SKSpriteNode *mainPlaceholder, *secondaryPlaceholder;
 
@@ -36,7 +35,7 @@ static NSString* paddleCategoryName = @"paddle";
 @implementation TSKMyScene {
     
     
-    SKLabelNode *waitingForTouch;
+    SKLabelNode *waitingForTouch, *gameOverLabel;
 }
 
 
@@ -78,12 +77,24 @@ static NSString* paddleCategoryName = @"paddle";
         [waitingForTouch setFontColor:[SKColor blackColor]];
         
         
+        gameOverLabel = [[SKLabelNode alloc] initWithFontNamed:@"Chalkduster"];
+        gameOverLabel.text = @"Game Over";
+        gameOverLabel.fontSize = 40;
+        gameOverLabel.zPosition = 2;
+        gameOverLabel.position = CGPointMake(CGRectGetMidX(self.frame),
+                                               CGRectGetMidY(self.frame));
+        [gameOverLabel setFontColor:[SKColor redColor]];
+        
+        
+        
         SKAction *fadeOut = [SKAction fadeOutWithDuration:0.5f];
         SKAction *fadeIn = [SKAction fadeInWithDuration:0.5f];
         SKAction *actionSequence = [SKAction sequence:@[fadeOut, fadeIn]];
         SKAction *repeat = [SKAction repeatActionForever:actionSequence];
         
         [waitingForTouch runAction:repeat];
+        
+        [gameOverLabel runAction:fadeIn];
         
         [self addChild:waitingForTouch];
         
@@ -212,8 +223,6 @@ static NSString* paddleCategoryName = @"paddle";
     
 }
 
-
-
 -(void)addShapes{
     
     SKShapeNode *shape = [[SKShapeNode alloc] init];
@@ -311,10 +320,10 @@ static NSString* paddleCategoryName = @"paddle";
         
     if (aux) {
         if([aux.name isEqualToString:@"mainPaddle"] || [aux.name isEqualToString:@"mainPlaceholder"]){
-            NSLog(@"Began touch on main paddle");
+//            NSLog(@"Began touch on main paddle");
             self.isFingerOnPaddle = YES;
         }else if([aux.name isEqualToString:@"secondaryPaddle"] || [aux.name isEqualToString:@"secondaryPlaceholder"]){
-            NSLog(@"Began touch on secondary paddle");
+//            NSLog(@"Began touch on secondary paddle");
             self.isFinderOnSecondaryPaddle = YES;
         }
     //    NSLog(@"%hhd %hhd", self.isFingerOnPaddle, self.isFinderOnSecondaryPaddle);
@@ -387,7 +396,7 @@ static NSString* paddleCategoryName = @"paddle";
             CGPoint previousLocation = [touch previousLocationInNode:self];
             // 3 Get node for paddle
             SKNode* aux = [self nodeAtPoint:touchLocation];
-            NSLog(@"%@", aux.name);
+//            NSLog(@"%@", aux.name);
             if(aux && [aux.name isEqualToString:@"mainPlaceholder"]){
                 SKShapeNode* paddle = (SKShapeNode*)self.mainPaddle;
                 // 4 Calculate new position along x for paddle
@@ -403,7 +412,7 @@ static NSString* paddleCategoryName = @"paddle";
             CGPoint previousLocation = [touch previousLocationInNode:self];
             // 3 Get node for paddle
             SKNode* aux = [self nodeAtPoint:touchLocation];
-            NSLog(@"%@", aux.name);
+//            NSLog(@"%@", aux.name);
             if(aux && [aux.name isEqualToString:@"secondaryPlaceholder"]){
                 SKShapeNode* paddle = (SKShapeNode*)self.secondaryPaddle;
                 // 4 Calculate new position along x for paddle
@@ -514,9 +523,26 @@ static NSString* paddleCategoryName = @"paddle";
 }
 
 
+
+-(void)addGameOverBackScreen{
+    NSLog(@"ASDASD");
+    SKSpriteNode *backNode = [[SKSpriteNode alloc] initWithColor:[SKColor blackColor] size:CGSizeMake(self.view.frame.size.width, self.view.frame.size.height)];
+    backNode.position = CGPointMake(self.view.frame.size.width/2, self.view.frame.size.height/2);
+    backNode.zPosition = 1;
+    backNode.alpha = 0.5;
+    
+    [self addChild:backNode];
+
+
+}
+
 -(void)gameOver{
-    NSLog(@"GAME FKING OVER!");
-    [self.scene setPaused:YES];
+    
+    [self.scene addChild:gameOverLabel];
+    [self addGameOverBackScreen];
+    
+    NSLog(@"GAME OVER!");
+    [self.view setPaused:YES];
     self.isPaused = YES;
 }
 
@@ -526,7 +552,7 @@ static NSString* paddleCategoryName = @"paddle";
         [waitingForTouch removeFromParent];
     }
     
-    if(self.gameStarted && self.qtdShapes <=0){
+    if(self.gameStarted && self.qtdShapes <=0 && !self.isPaused){
         [self gameOver];
     }
     
