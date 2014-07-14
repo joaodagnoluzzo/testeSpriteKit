@@ -23,6 +23,7 @@
 		CF9573DD18D76F7500C05722 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CF9573B818D76F7500C05722 /* UIKit.framework */; };
 		CF9573E518D76F7500C05722 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = CF9573E318D76F7500C05722 /* InfoPlist.strings */; };
 		CF9573E718D76F7500C05722 /* testeSpriteKitTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CF9573E618D76F7500C05722 /* testeSpriteKitTests.m */; };
+		CFA50E5E19745328003ADC73 /* TSKMenuScene.m in Sources */ = {isa = PBXBuildFile; fileRef = CFA50E5D19745328003ADC73 /* TSKMenuScene.m */; };
 		CFDE77E719633EB6006BDA5C /* spikes.png in Resources */ = {isa = PBXBuildFile; fileRef = CFDE77E619633EB6006BDA5C /* spikes.png */; };
 /* End PBXBuildFile section */
 
@@ -59,6 +60,8 @@
 		CF9573E218D76F7500C05722 /* testeSpriteKitTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "testeSpriteKitTests-Info.plist"; sourceTree = "<group>"; };
 		CF9573E418D76F7500C05722 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		CF9573E618D76F7500C05722 /* testeSpriteKitTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = testeSpriteKitTests.m; sourceTree = "<group>"; };
+		CFA50E5C19745328003ADC73 /* TSKMenuScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSKMenuScene.h; sourceTree = "<group>"; };
+		CFA50E5D19745328003ADC73 /* TSKMenuScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKMenuScene.m; sourceTree = "<group>"; };
 		CFDE77E619633EB6006BDA5C /* spikes.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spikes.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -129,6 +132,8 @@
 				CF9573CC18D76F7500C05722 /* TSKViewController.m */,
 				CF9573CE18D76F7500C05722 /* TSKMyScene.h */,
 				CF9573CF18D76F7500C05722 /* TSKMyScene.m */,
+				CFA50E5C19745328003ADC73 /* TSKMenuScene.h */,
+				CFA50E5D19745328003ADC73 /* TSKMenuScene.m */,
 				CF9573D318D76F7500C05722 /* Images.xcassets */,
 				CF9573BD18D76F7500C05722 /* Supporting Files */,
 			);
@@ -283,6 +288,7 @@
 				CF9573D018D76F7500C05722 /* TSKMyScene.m in Sources */,
 				CF9573C318D76F7500C05722 /* main.m in Sources */,
 				CF9573C718D76F7500C05722 /* TSKAppDelegate.m in Sources */,
+				CFA50E5E19745328003ADC73 /* TSKMenuScene.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

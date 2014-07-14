@@ -27,7 +27,7 @@ static NSString* paddleCategoryName = @"paddle";
 @property NSInteger paddleHeight, paddleWidth, qtdShapes, userPoints;
 @property SKLabelNode *points_hud, *balls_number;
 @property SKShapeNode *mainPaddle, *secondaryPaddle;
-@property SKSpriteNode *mainPlaceholder, *secondaryPlaceholder;
+@property SKSpriteNode *mainPlaceholder, *secondaryPlaceholder, *backNode;
 
 @end
 
@@ -35,7 +35,7 @@ static NSString* paddleCategoryName = @"paddle";
 @implementation TSKMyScene {
     
     
-    SKLabelNode *waitingForTouch, *gameOverLabel;
+    SKLabelNode *waitingForTouch, *gameOverLabel, *playAgainLabel, *highScoreLabel, *scoreLabel;
 }
 
 
@@ -50,23 +50,7 @@ static NSString* paddleCategoryName = @"paddle";
         self.backgroundColor = [SKColor colorWithRed:1-0.15 green:1-0.15 blue:1-0.3 alpha:1.0];
         
         
-        self.physicsWorld.contactDelegate = self;
-        
-        self.physicsBody.categoryBitMask = WORLD;
-        //NSLog(@"%u", self.physicsBody.categoryBitMask);
-        
-        self.physicsBody.collisionBitMask = SHAPE | GROUND;
-        self.physicsBody.contactTestBitMask = SHAPE;
-        
-        self.physicsBody = [SKPhysicsBody bodyWithEdgeLoopFromRect:self.frame];
-        
-        self.physicsBody.friction = 0.0f;
-        // 4
-        self.physicsBody.restitution = 1.0f;
-        // 5
-        self.physicsBody.linearDamping = 0.0f;
-        // 6
-        self.physicsBody.allowsRotation = NO;
+        [self setWorldPhysics];
         
         
         waitingForTouch = [[SKLabelNode alloc] initWithFontNamed:@"Chalkduster"];
@@ -76,25 +60,12 @@ static NSString* paddleCategoryName = @"paddle";
                                        CGRectGetMidY(self.frame));
         [waitingForTouch setFontColor:[SKColor blackColor]];
         
-        
-        gameOverLabel = [[SKLabelNode alloc] initWithFontNamed:@"Chalkduster"];
-        gameOverLabel.text = @"Game Over";
-        gameOverLabel.fontSize = 40;
-        gameOverLabel.zPosition = 2;
-        gameOverLabel.position = CGPointMake(CGRectGetMidX(self.frame),
-                                               CGRectGetMidY(self.frame));
-        [gameOverLabel setFontColor:[SKColor redColor]];
-        
-        
-        
         SKAction *fadeOut = [SKAction fadeOutWithDuration:0.5f];
         SKAction *fadeIn = [SKAction fadeInWithDuration:0.5f];
         SKAction *actionSequence = [SKAction sequence:@[fadeOut, fadeIn]];
         SKAction *repeat = [SKAction repeatActionForever:actionSequence];
         
         [waitingForTouch runAction:repeat];
-        
-        [gameOverLabel runAction:fadeIn];
         
         [self addChild:waitingForTouch];
         
@@ -104,6 +75,48 @@ static NSString* paddleCategoryName = @"paddle";
     return self;
 }
 
+-(void)setWorldPhysics{
+    self.physicsWorld.contactDelegate = self;
+    
+    self.physicsBody.categoryBitMask = WORLD;
+    //NSLog(@"%u", self.physicsBody.categoryBitMask);
+    
+    self.physicsBody.collisionBitMask = SHAPE | GROUND;
+    self.physicsBody.contactTestBitMask = SHAPE;
+    
+    self.physicsBody = [SKPhysicsBody bodyWithEdgeLoopFromRect:self.frame];
+    
+    self.physicsBody.friction = 0.0f;
+    // 4
+    self.physicsBody.restitution = 1.0f;
+    // 5
+    self.physicsBody.linearDamping = 0.0f;
+    // 6
+    self.physicsBody.allowsRotation = NO;
+    
+    self.physicsWorld.gravity = CGVectorMake(0, -10);
+}
+
+-(void)playAgain{
+  
+   // [self removeAllActions];
+    [self removeAllChildren];
+   
+    [self setWorldPhysics];
+    
+    self.userPoints = 0;
+    self.qtdShapes = 0;
+    
+    self.gameStarted = NO;
+    self.isPaused = NO;
+    
+    [playAgainLabel removeFromParent];
+    [gameOverLabel removeFromParent];
+    [scoreLabel removeFromParent];
+    [highScoreLabel removeFromParent];
+    
+    [self addEnvironment];
+}
 
 -(void)addEnvironment{
     /* Called when a touch begins */
@@ -181,6 +194,8 @@ static NSString* paddleCategoryName = @"paddle";
     SKAction *sequence = [SKAction sequence:@[wait, action]];
     SKAction *repeat = [SKAction repeatActionForever:sequence];
     [self runAction:repeat];
+    
+    
 }
 
 -(void)addSecondaryPaddle{
@@ -253,12 +268,13 @@ static NSString* paddleCategoryName = @"paddle";
     
     shape.physicsBody.restitution = 1; //bouncing
     shape.physicsBody.linearDamping = 0; //reduces linear velocity
-    
+    shape.physicsBody.velocity = CGVectorMake(0, -10);
     
     [self addChild:shape];
     self.qtdShapes += 1;
     self.gameStarted = YES;
-    
+    //self.physicsWorld.gravity = CGVectorMake(0,-20);
+
 }
 
 
@@ -318,69 +334,20 @@ static NSString* paddleCategoryName = @"paddle";
 //    SKPhysicsBody* body = [self.physicsWorld bodyAtPoint:touchLocation];
 //        NSLog(@">> %@",body.node.name);
         
-    if (aux) {
-        if([aux.name isEqualToString:@"mainPaddle"] || [aux.name isEqualToString:@"mainPlaceholder"]){
-//            NSLog(@"Began touch on main paddle");
-            self.isFingerOnPaddle = YES;
-        }else if([aux.name isEqualToString:@"secondaryPaddle"] || [aux.name isEqualToString:@"secondaryPlaceholder"]){
-//            NSLog(@"Began touch on secondary paddle");
-            self.isFinderOnSecondaryPaddle = YES;
+        if (aux) {
+            if([aux.name isEqualToString:@"mainPaddle"] || [aux.name isEqualToString:@"mainPlaceholder"]){
+                //            NSLog(@"Began touch on main paddle");
+                self.isFingerOnPaddle = YES;
+            }else if([aux.name isEqualToString:@"secondaryPaddle"] || [aux.name isEqualToString:@"secondaryPlaceholder"]){
+                //            NSLog(@"Began touch on secondary paddle");
+                self.isFinderOnSecondaryPaddle = YES;
+            }else if([aux.name isEqualToString:@"Play Again"]){
+                NSLog(@"Do the Play Again action..");
+                [self playAgain];
+            }
+            //    NSLog(@"%hhd %hhd", self.isFingerOnPaddle, self.isFinderOnSecondaryPaddle);
         }
-    //    NSLog(@"%hhd %hhd", self.isFingerOnPaddle, self.isFinderOnSecondaryPaddle);
     }
-    }
-
-//    for (UITouch *touch in touches) {
-//        CGPoint location = [touch locationInNode:self];
-//       
-//        SKShapeNode *shape = [[SKShapeNode alloc] init];
-//        
-//        CGMutablePathRef myPath = CGPathCreateMutable();
-//        CGPathAddArc(myPath, NULL, 0, 0, 30, 0, M_PI*2, YES);
-//        
-//        shape.path = myPath;
-//        
-//        shape.position = location;
-//        
-//        //Random Color
-//        CGFloat hue = ( arc4random() % 256 / 256.0 );  //  0.0 to 1.0
-//        CGFloat saturation = ( arc4random() % 128 / 256.0 ) + 0.5;  //  0.5 to 1.0, away from white
-//        CGFloat brightness = ( arc4random() % 128 / 256.0 ) + 0.5;  //  0.5 to 1.0, away from black
-//        shape.fillColor = [SKColor colorWithHue:hue saturation:saturation brightness:brightness alpha:1];
-//        
-//        
-//        shape.physicsBody = [SKPhysicsBody bodyWithCircleOfRadius:30];
-//        
-//        shape.physicsBody.dynamic = YES;
-//        
-//        shape.physicsBody.categoryBitMask = SHAPE;
-//        shape.physicsBody.collisionBitMask = SHAPE | WORLD;
-//        shape.physicsBody.contactTestBitMask = SHAPE | WORLD;
-//        //shape.physicsBody.velocity = CGVectorMake(0.0, 1000.0);
-//        
-//        shape.physicsBody.restitution = 1; //bouncing
-//        shape.physicsBody.linearDamping = 0; //reduces linear velocity
-//        shape.physicsBody.restitution = 1;
-//        
-//        [self addChild:shape];
-//        
-//        
-//        
-//        
-//        //Label
-//        SKLabelNode *label = [SKLabelNode labelNodeWithFontNamed:@"Chalkduster"];
-//        label.text = @"Shape adicionado!";
-//        label.fontSize = 30;
-//        label.position = CGPointMake(CGRectGetMidX(self.frame), 50);
-//       
-//        SKAction *actionForLabel = [SKAction fadeOutWithDuration:1.0f];
-//        SKAction *remove = [SKAction removeFromParent];
-//        
-//        [label runAction:[SKAction sequence:@[actionForLabel, remove]]];
-//        
-//        [self addChild:label];
-//    }
-    
 }
 
 
@@ -422,6 +389,7 @@ static NSString* paddleCategoryName = @"paddle";
                 paddle.position = CGPointMake(paddleX, paddleY);
             }
         }
+        
     }
     
 
@@ -526,24 +494,80 @@ static NSString* paddleCategoryName = @"paddle";
 
 -(void)addGameOverBackScreen{
     NSLog(@"ASDASD");
-    SKSpriteNode *backNode = [[SKSpriteNode alloc] initWithColor:[SKColor blackColor] size:CGSizeMake(self.view.frame.size.width, self.view.frame.size.height)];
-    backNode.position = CGPointMake(self.view.frame.size.width/2, self.view.frame.size.height/2);
-    backNode.zPosition = 1;
-    backNode.alpha = 0.5;
+    self.backNode = [[SKSpriteNode alloc] initWithColor:[SKColor blackColor] size:CGSizeMake(self.view.frame.size.width, self.view.frame.size.height)];
+    self.backNode.position = CGPointMake(self.view.frame.size.width/2, self.view.frame.size.height/2);
+    self.backNode.zPosition = 1;
+    self.backNode.alpha = 0.5;
     
-    [self addChild:backNode];
-
-
+    [self addChild:self.backNode];
 }
+
+
 
 -(void)gameOver{
     
-    [self.scene addChild:gameOverLabel];
+    [self removeAllActions];
+    
+    gameOverLabel = [[SKLabelNode alloc] initWithFontNamed:@"Chalkduster"];
+    gameOverLabel.text = @"Game Over";
+    gameOverLabel.fontSize = 50;
+    gameOverLabel.zPosition = 2;
+    gameOverLabel.position = CGPointMake(CGRectGetMidX(self.frame),
+                                         CGRectGetMidY(self.frame)/2 +500);
+    [gameOverLabel setFontColor:[SKColor redColor]];
+    
+    
+    playAgainLabel = [[SKLabelNode alloc] initWithFontNamed:@"Chalkduster"];
+    playAgainLabel.text = @"Play Again";
+    playAgainLabel.name = playAgainLabel.text;
+    playAgainLabel.fontSize = 30;
+    playAgainLabel.zPosition = 2;
+    playAgainLabel.position = CGPointMake(0, -100);
+    
+    scoreLabel = [[SKLabelNode alloc] initWithFontNamed:@"Chalkduster"];
+    scoreLabel.text = [NSString stringWithFormat:@"Score: %ld", (long)self.userPoints];
+    scoreLabel.fontSize = 20;
+    scoreLabel.zPosition = 2;
+    scoreLabel.position = CGPointMake(0, -200);
+    
+    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+    NSInteger bestScore = [prefs integerForKey:@"bestScore"];
+    if(bestScore<self.userPoints){
+        bestScore = self.userPoints;
+        [prefs setInteger:self.userPoints forKey:@"bestScore"];
+    }
+    
+    highScoreLabel = [[SKLabelNode alloc] initWithFontNamed:@"Chalkduster"];
+    highScoreLabel.text =[NSString stringWithFormat:@"High Score: %li", (long)bestScore];
+    highScoreLabel.fontSize = 20;
+    highScoreLabel.zPosition = 2;
+    highScoreLabel.position = CGPointMake(0, -50);
+    
+    
+    
+    SKAction *fadeOut = [SKAction fadeOutWithDuration:0.5f];
+    SKAction *fadeIn = [SKAction fadeInWithDuration:0.5f];
+    SKAction *actionSequence = [SKAction sequence:@[fadeOut, fadeIn]];
+    SKAction *repeat = [SKAction repeatActionForever:actionSequence];
+    
+    
+    [self addChild:gameOverLabel];
+//    [gameOverLabel runAction: fadeIn];
+    
+    [gameOverLabel addChild: playAgainLabel];
+    [playAgainLabel runAction:repeat];
+    
+    [gameOverLabel addChild:scoreLabel];
+//    [scoreLabel runAction:fadeIn];
+    
+    [scoreLabel addChild:highScoreLabel];
+//    [highScoreLabel runAction:fadeIn];
+    
     [self addGameOverBackScreen];
     
     NSLog(@"GAME OVER!");
-    [self.view setPaused:YES];
-    self.isPaused = YES;
+   // [self.view setPaused:YES];
+     self.isPaused = YES;
 }
 
 -(void)update:(CFTimeInterval)currentTime {

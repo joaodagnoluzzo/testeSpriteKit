@@ -7,7 +7,7 @@
 //
 
 #import "TSKViewController.h"
-#import "TSKMyScene.h"
+#import "TSKMenuScene.h"
 
 @implementation TSKViewController
 
@@ -22,7 +22,7 @@
     //skView.showsPhysics = YES;
     
     // Create and configure the scene.
-    SKScene * scene = [TSKMyScene sceneWithSize:skView.bounds.size];
+    SKScene * scene = [TSKMenuScene sceneWithSize:skView.bounds.size];
     scene.scaleMode = SKSceneScaleModeAspectFill;
     
     // Present the scene.
