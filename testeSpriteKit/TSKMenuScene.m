@@ -16,7 +16,7 @@
 
 @implementation TSKMenuScene{
     
-    SKLabelNode *play, *highScore;
+    SKLabelNode *play, *highScore, *name;
     
 }
 
@@ -53,8 +53,20 @@
         [highScore setFontColor:[SKColor blackColor]];
         
         [self addChild:highScore];
-        
+    
         [highScore setHidden:YES];
+        
+        
+        
+        name = [[SKLabelNode alloc] initWithFontNamed:@"Chalkduster"];
+        name.text = @"PLACEHOLDER - NOME";
+        name.name = @"Nome";
+        name.fontSize = 60;
+        name.position = CGPointMake(CGRectGetMidX(self.frame),
+                                    CGRectGetMidY(self.frame)+300);
+        [self addChild:name];
+        
+        
     }
     
     

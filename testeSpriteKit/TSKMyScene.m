@@ -141,9 +141,10 @@ static NSString* paddleCategoryName = @"paddle";
     self.points_hud = [[SKLabelNode alloc] initWithFontNamed:@"Chalkduster"];
     self.points_hud.text = [NSString stringWithFormat:@"Score: %li", (long)self.userPoints];
     self.points_hud.fontSize = 30;
-    self.points_hud.position = CGPointMake(CGRectGetMidX(self.frame),
-                                           CGRectGetMidY(self.frame)*1/3 -10);
+    self.points_hud.position = CGPointMake(CGRectGetMidX(self.frame)+160, CGRectGetHeight(self.frame)-60);
+    
     [self.points_hud setFontColor:[SKColor blackColor]];
+    self.points_hud.zPosition = 2;
     
     [self addChild:self.points_hud];
     
@@ -153,6 +154,7 @@ static NSString* paddleCategoryName = @"paddle";
     self.balls_number.position = CGPointMake(CGRectGetMidX(self.frame),
                                            CGRectGetMidY(self.frame)*1/3 -50);
     [self.balls_number setFontColor:[SKColor blackColor]];
+    self.balls_number.zPosition = 2;
     
     [self addChild:self.balls_number];
     
