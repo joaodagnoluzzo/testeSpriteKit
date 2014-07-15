@@ -28,10 +28,18 @@
         play = [[SKLabelNode alloc] initWithFontNamed:@"Chalkduster"];
         play.text = @"Play";
         play.name = @"Play";
-        play.fontSize = 30;
+        play.fontSize = 40;
         play.position = CGPointMake(CGRectGetMidX(self.frame),
                                                CGRectGetMidY(self.frame));
         [play setFontColor:[SKColor blackColor]];
+        
+//        SKAction *fadeOut = [SKAction fadeOutWithDuration:1.0f];
+//        SKAction *fadeIn = [SKAction fadeInWithDuration:1.0f];
+//        SKAction *actionSequence = [SKAction sequence:@[fadeOut, fadeIn]];
+//        SKAction *repeat = [SKAction repeatActionForever:actionSequence];
+//        
+//        [play runAction:repeat];
+        
         
         [self addChild:play];
         
@@ -53,7 +61,6 @@
     
     return self;
 }
-
 
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event{
     

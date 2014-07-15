@@ -31,13 +31,17 @@ static NSString* paddleCategoryName = @"paddle";
 
 @end
 
+#pragma mark - implementation
 
 @implementation TSKMyScene {
     
     
-    SKLabelNode *waitingForTouch, *gameOverLabel, *playAgainLabel, *highScoreLabel, *scoreLabel;
+    SKLabelNode *waitingForTouch, *gameOverLabel, *playAgainLabel, *highScoreLabel, *scoreLabel, *play_pause, *goBackToMenu;
+    
+    SKSpriteNode *pausePlaceholder;
 }
 
+#pragma mark - init
 
 -(id)initWithSize:(CGSize)size {    
     if (self = [super initWithSize:size]) {
@@ -54,10 +58,10 @@ static NSString* paddleCategoryName = @"paddle";
         
         
         waitingForTouch = [[SKLabelNode alloc] initWithFontNamed:@"Chalkduster"];
-        waitingForTouch.text = @"Tap to START!";
+        waitingForTouch.text = @"Tap when Ready!";
         waitingForTouch.fontSize = 30;
         waitingForTouch.position = CGPointMake(CGRectGetMidX(self.frame),
-                                       CGRectGetMidY(self.frame));
+                                       CGRectGetMidY(self.frame)-200);
         [waitingForTouch setFontColor:[SKColor blackColor]];
         
         SKAction *fadeOut = [SKAction fadeOutWithDuration:0.5f];
@@ -97,6 +101,8 @@ static NSString* paddleCategoryName = @"paddle";
     self.physicsWorld.gravity = CGVectorMake(0, -10);
 }
 
+#pragma mark - play again
+
 -(void)playAgain{
   
    // [self removeAllActions];
@@ -109,6 +115,7 @@ static NSString* paddleCategoryName = @"paddle";
     
     self.gameStarted = NO;
     self.isPaused = NO;
+    [play_pause setHidden:NO];
     
     [playAgainLabel removeFromParent];
     [gameOverLabel removeFromParent];
@@ -117,6 +124,9 @@ static NSString* paddleCategoryName = @"paddle";
     
     [self addEnvironment];
 }
+
+
+#pragma mark - add nodes
 
 -(void)addEnvironment{
     /* Called when a touch begins */
@@ -152,6 +162,23 @@ static NSString* paddleCategoryName = @"paddle";
     [self addPaddle];
     
     [self addSecondaryPaddle];
+    
+    
+    play_pause = [[SKLabelNode alloc] initWithFontNamed:@"Chalkduster"];
+    play_pause.name = @"Play_Pause";
+    play_pause.text = @"Pause";
+    play_pause.fontColor = [SKColor blackColor];
+    play_pause.fontSize = 30.0f;
+    play_pause.zPosition = 3;
+    play_pause.position = CGPointMake(CGRectGetWidth(self.frame)-60, CGRectGetHeight(self.frame)-60);
+    
+    [self addChild:play_pause];
+    
+    pausePlaceholder = [[SKSpriteNode alloc] initWithColor:[SKColor clearColor] size:CGSizeMake(120, 120)];
+    pausePlaceholder.name = @"Play_Pause";
+    pausePlaceholder.zPosition = 2;
+    
+    [play_pause addChild:pausePlaceholder];
 }
 
 -(void)addPaddle{
@@ -317,6 +344,8 @@ static NSString* paddleCategoryName = @"paddle";
     
 }
 
+#pragma mark - contact handlers
+
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
 //    
 //    if(self.isPaused)
@@ -344,7 +373,20 @@ static NSString* paddleCategoryName = @"paddle";
             }else if([aux.name isEqualToString:@"Play Again"]){
                 NSLog(@"Do the Play Again action..");
                 [self playAgain];
+            }if([aux.name isEqual:@"Back To Menu"]){
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"gotoMenu"
+                                                                    object:nil
+                                                                  userInfo:nil];
+            }if([aux.name isEqual:@"Play_Pause"]){
+                if(self.isPaused){
+                    [self unPause];
+                    [play_pause setText:@"Pause"];
+                }else{
+                    [self pause];
+                    [play_pause setText:@"Play"];
+                }
             }
+            
             //    NSLog(@"%hhd %hhd", self.isFingerOnPaddle, self.isFinderOnSecondaryPaddle);
         }
     }
@@ -394,31 +436,6 @@ static NSString* paddleCategoryName = @"paddle";
     
 
 }
-
-//    for(UITouch *touch in array){
-//    dispatch_queue_t myQueue = dispatch_queue_create("myQueue", nil);
-//    
-//    dispatch_async(myQueue, ^{
-//        
-//        if(self.isFingerOnPaddle || self.isFinderOnSecondaryPaddle){
-//            //            UITouch* touch = [touches anyObject];
-//            CGPoint touchLocation = [touch locationInNode:self];
-//            CGPoint previousLocation = [touch previousLocationInNode:self];
-//            // 3 Get node for paddle
-//            SKShapeNode* paddle = (SKShapeNode*)[self nodeAtPoint:touchLocation];
-//            // 4 Calculate new position along x for paddle
-//            int paddleX = paddle.position.x + (touchLocation.x - previousLocation.x);
-//            int paddleY = paddle.position.y + (touchLocation.y - previousLocation.y);
-//        
-//        dispatch_async(dispatch_get_main_queue(), ^{
-//            // 6 Update position of paddle
-//            paddle.position = CGPointMake(paddleX, paddleY);
-//        });
-//        
-//        }
-//    });
-//    }
-//    
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event{
     
@@ -491,14 +508,18 @@ static NSString* paddleCategoryName = @"paddle";
 }
 
 
+#pragma mark - game over
+
 
 -(void)addGameOverBackScreen{
-    NSLog(@"ASDASD");
-    self.backNode = [[SKSpriteNode alloc] initWithColor:[SKColor blackColor] size:CGSizeMake(self.view.frame.size.width, self.view.frame.size.height)];
-    self.backNode.position = CGPointMake(self.view.frame.size.width/2, self.view.frame.size.height/2);
-    self.backNode.zPosition = 1;
-    self.backNode.alpha = 0.5;
-    
+//    NSLog(@"ASDASD");
+
+    if(!self.backNode){
+        self.backNode = [[SKSpriteNode alloc] initWithColor:[SKColor blackColor] size:CGSizeMake(self.view.frame.size.width, self.view.frame.size.height)];
+        self.backNode.position = CGPointMake(self.view.frame.size.width/2, self.view.frame.size.height/2);
+        self.backNode.zPosition = 1;
+        self.backNode.alpha = 0.5;
+    }
     [self addChild:self.backNode];
 }
 
@@ -567,8 +588,11 @@ static NSString* paddleCategoryName = @"paddle";
     
     NSLog(@"GAME OVER!");
    // [self.view setPaused:YES];
-     self.isPaused = YES;
+    [play_pause setHidden:YES];
+    self.isPaused = YES;
 }
+
+#pragma mark - update
 
 -(void)update:(CFTimeInterval)currentTime {
     /* Called before each frame is rendered */
@@ -582,6 +606,76 @@ static NSString* paddleCategoryName = @"paddle";
     
     self.points_hud.text = [NSString stringWithFormat:@"Score: %li", (long)self.userPoints];
     self.balls_number.text = [NSString stringWithFormat:@"Number of balls: %li", (long)self.qtdShapes];
+}
+
+
+
+#pragma mark - pause
+
+-(void)pause{
+    
+    [self.scene setPaused:YES];
+    self.isPaused = YES;
+    [play_pause setText:@"Continue"];
+    [play_pause setFontColor:[SKColor whiteColor]];
+    [self addGameOverBackScreen];
+    
+    
+    goBackToMenu = [[SKLabelNode alloc] initWithFontNamed:@"Chalkduster"];
+    goBackToMenu.name = @"Back To Menu";
+    goBackToMenu.text = @"Back to Menu";
+    goBackToMenu.fontSize = 30.0f;
+    goBackToMenu.fontColor = [SKColor whiteColor];
+    goBackToMenu.position = CGPointMake(CGRectGetMidX(self.frame), CGRectGetMidY(self.frame));
+    goBackToMenu.zPosition = 2;
+    
+    [self addChild:goBackToMenu];
+    
+    scoreLabel = [[SKLabelNode alloc] initWithFontNamed:@"Chalkduster"];
+    scoreLabel.text = [NSString stringWithFormat:@"Score: %ld", (long)self.userPoints];
+    scoreLabel.fontSize = 20;
+    scoreLabel.zPosition = 2;
+    scoreLabel.position = CGPointMake(0, -200);
+    
+    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+    NSInteger bestScore = [prefs integerForKey:@"bestScore"];
+    if(bestScore<self.userPoints){
+        bestScore = self.userPoints;
+        [prefs setInteger:self.userPoints forKey:@"bestScore"];
+    }
+    
+    highScoreLabel = [[SKLabelNode alloc] initWithFontNamed:@"Chalkduster"];
+    highScoreLabel.text =[NSString stringWithFormat:@"High Score: %li", (long)bestScore];
+    highScoreLabel.fontSize = 20;
+    highScoreLabel.zPosition = 2;
+    highScoreLabel.position = CGPointMake(0, -50);
+    
+    [goBackToMenu addChild:scoreLabel];
+    [scoreLabel addChild:highScoreLabel];
+    
+    
+    [self.balls_number setHidden:YES];
+    [self.points_hud setHidden:YES];
+}
+
+
+
+-(void)unPause{
+    
+    [self.scene setPaused:NO];
+    self.isPaused = NO;
+    [play_pause setText:@"Pause"];
+    [play_pause setFontColor:[SKColor blackColor]];
+    [self.backNode removeFromParent];
+    [goBackToMenu removeFromParent];
+    
+    [scoreLabel removeFromParent];
+    [highScoreLabel removeFromParent];
+    
+    
+    [self.balls_number setHidden:NO];
+    [self.points_hud setHidden:NO];
+    
 }
 
 

@@ -25,9 +25,38 @@
     SKScene * scene = [TSKMenuScene sceneWithSize:skView.bounds.size];
     scene.scaleMode = SKSceneScaleModeAspectFill;
     
-    // Present the scene.
-    [skView presentScene:scene];
+    
+    if ( !skView.scene ) { // <------- !!
+        
+        SKScene *menuScene = [TSKMenuScene sceneWithSize:skView.bounds.size];
+        menuScene.scaleMode = SKSceneScaleModeAspectFill;
+        
+        // Present the scene.
+        [skView presentScene:scene];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(presentMenu)
+                                                     name:@"gotoMenu"
+                                                   object:nil];
+    }
+    
 }
+
+
+
+-(void)presentMenu{
+    
+    
+    SKView *skView = (SKView *)self.view;
+    
+    SKScene *menuScene = [TSKMenuScene sceneWithSize:skView.bounds.size];
+    menuScene.scaleMode = SKSceneScaleModeAspectFill;
+    
+    [skView presentScene:menuScene];
+    
+}
+
+
 
 - (BOOL)shouldAutorotate
 {
