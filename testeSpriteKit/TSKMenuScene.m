@@ -57,7 +57,6 @@
         [highScore setHidden:YES];
         
         
-        
         name = [[SKLabelNode alloc] initWithFontNamed:@"Chalkduster"];
         name.text = @"PLACEHOLDER - NOME";
         name.name = @"Nome";

@@ -34,7 +34,7 @@ static NSString* paddleCategoryName = @"paddle";
 #pragma mark - implementation
 
 @implementation TSKMyScene {
-    
+
     
     SKLabelNode *waitingForTouch, *gameOverLabel, *playAgainLabel, *highScoreLabel, *scoreLabel, *play_pause, *goBackToMenu;
     
@@ -141,7 +141,7 @@ static NSString* paddleCategoryName = @"paddle";
     self.points_hud = [[SKLabelNode alloc] initWithFontNamed:@"Chalkduster"];
     self.points_hud.text = [NSString stringWithFormat:@"Score: %li", (long)self.userPoints];
     self.points_hud.fontSize = 30;
-    self.points_hud.position = CGPointMake(CGRectGetMidX(self.frame)+160, CGRectGetHeight(self.frame)-60);
+    self.points_hud.position = CGPointMake(CGRectGetMidX(self.frame)-280, CGRectGetHeight(self.frame)-60);
     
     [self.points_hud setFontColor:[SKColor blackColor]];
     self.points_hud.zPosition = 2;
@@ -154,7 +154,7 @@ static NSString* paddleCategoryName = @"paddle";
     self.balls_number.position = CGPointMake(CGRectGetMidX(self.frame),
                                            CGRectGetMidY(self.frame)*1/3 -50);
     [self.balls_number setFontColor:[SKColor blackColor]];
-    self.balls_number.zPosition = 2;
+    self.balls_number.zPosition = 0;
     
     [self addChild:self.balls_number];
     
@@ -369,9 +369,17 @@ static NSString* paddleCategoryName = @"paddle";
             if([aux.name isEqualToString:@"mainPaddle"] || [aux.name isEqualToString:@"mainPlaceholder"]){
                 //            NSLog(@"Began touch on main paddle");
                 self.isFingerOnPaddle = YES;
+                NSLog(@"%f, %f",self.mainPlaceholder.size.height, self.mainPlaceholder.size.width);
+                self.mainPlaceholder.size = CGSizeMake(220, 180);
+                
+                
             }else if([aux.name isEqualToString:@"secondaryPaddle"] || [aux.name isEqualToString:@"secondaryPlaceholder"]){
                 //            NSLog(@"Began touch on secondary paddle");
                 self.isFinderOnSecondaryPaddle = YES;
+                NSLog(@"%f, %f",self.secondaryPlaceholder.size.height, self.secondaryPlaceholder.size.width);
+                self.secondaryPlaceholder.size = CGSizeMake(220, 180);
+                
+                
             }else if([aux.name isEqualToString:@"Play Again"]){
                 NSLog(@"Do the Play Again action..");
                 [self playAgain];
@@ -444,13 +452,21 @@ static NSString* paddleCategoryName = @"paddle";
     [super touchesMoved:touches withEvent:event];
     
     UITouch *touch = [touches anyObject];
-    CGPoint currentPosition = [touch locationInView:self.view];
+    CGPoint currentPosition = [touch locationInNode:self];
+    
+    NSLog(@"ended");
     
     SKNode *node = [self nodeAtPoint:currentPosition];
     if([node.name isEqualToString:@"mainPaddle"] || [node.name isEqualToString:@"mainPlaceholder"]){
         self.isFingerOnPaddle = NO;
+        self.mainPlaceholder.size = CGSizeMake(180, 180);
+        NSLog(@"main");
+        
     }else if([node.name isEqualToString:@"secondaryPaddle"] || [node.name isEqualToString:@"secondaryPlaceholder"]){
         self.isFinderOnSecondaryPaddle = NO;
+        self.secondaryPlaceholder.size = CGSizeMake(180, 180);
+        NSLog(@"secondary");
+        
     }
 }
 
