@@ -35,10 +35,12 @@ static NSString* paddleCategoryName = @"paddle";
 
 @implementation TSKMyScene {
 
-    
     SKLabelNode *waitingForTouch, *gameOverLabel, *playAgainLabel, *highScoreLabel, *scoreLabel, *play_pause, *goBackToMenu;
     
     SKSpriteNode *pausePlaceholder;
+    
+    int time;
+    
 }
 
 #pragma mark - init
@@ -218,7 +220,7 @@ static NSString* paddleCategoryName = @"paddle";
     self.mainPaddle = paddle;
     self.mainPlaceholder = placeholder;
     
-    SKAction *wait = [SKAction waitForDuration:2];
+    SKAction *wait = [SKAction waitForDuration:4];
     SKAction *action = [SKAction performSelector:@selector(addShapes) onTarget:self];
     SKAction *sequence = [SKAction sequence:@[wait, action]];
     SKAction *repeat = [SKAction repeatActionForever:sequence];
@@ -295,7 +297,7 @@ static NSString* paddleCategoryName = @"paddle";
     shape.physicsBody.collisionBitMask = SHAPE| PADDLE | GROUND;
     shape.physicsBody.contactTestBitMask = SHAPE | GROUND | PADDLE ;
     
-    shape.physicsBody.restitution = 1; //bouncing
+    shape.physicsBody.restitution = 1.00001; //bouncing
     shape.physicsBody.linearDamping = 0; //reduces linear velocity
     shape.physicsBody.velocity = CGVectorMake(0, -10);
     
@@ -370,14 +372,14 @@ static NSString* paddleCategoryName = @"paddle";
                 //            NSLog(@"Began touch on main paddle");
                 self.isFingerOnPaddle = YES;
                 NSLog(@"%f, %f",self.mainPlaceholder.size.height, self.mainPlaceholder.size.width);
-                self.mainPlaceholder.size = CGSizeMake(220, 180);
+                self.mainPlaceholder.size = CGSizeMake(220, 200);
                 
                 
             }else if([aux.name isEqualToString:@"secondaryPaddle"] || [aux.name isEqualToString:@"secondaryPlaceholder"]){
                 //            NSLog(@"Began touch on secondary paddle");
                 self.isFinderOnSecondaryPaddle = YES;
                 NSLog(@"%f, %f",self.secondaryPlaceholder.size.height, self.secondaryPlaceholder.size.width);
-                self.secondaryPlaceholder.size = CGSizeMake(220, 180);
+                self.secondaryPlaceholder.size = CGSizeMake(220, 200);
                 
                 
             }else if([aux.name isEqualToString:@"Play Again"]){
@@ -421,6 +423,14 @@ static NSString* paddleCategoryName = @"paddle";
                 // 4 Calculate new position along x for paddle
                 int paddleX = paddle.position.x + (touchLocation.x - previousLocation.x);
                 int paddleY = paddle.position.y + (touchLocation.y - previousLocation.y);
+                // 5 verify if the position is allowed
+                if(paddleX < self.view.frame.size.width/2 + 90){
+                    paddleX = self.view.frame.size.width/2 + 90;
+                }
+                if(paddleY > self.view.frame.size.height/2 - 20){
+                    paddleY = self.view.frame.size.height/2 - 20;
+                }
+                
                 // 6 Update position of paddle
                 paddle.position = CGPointMake(paddleX, paddleY);
             }
@@ -437,6 +447,13 @@ static NSString* paddleCategoryName = @"paddle";
                 // 4 Calculate new position along x for paddle
                 int paddleX = paddle.position.x + (touchLocation.x - previousLocation.x);
                 int paddleY = paddle.position.y + (touchLocation.y - previousLocation.y);
+                // 5 verify if the position is allowed
+                if(paddleX > self.view.frame.size.width/2 - 90){
+                    paddleX = self.view.frame.size.width/2 - 90;
+                }
+                if(paddleY > self.view.frame.size.height/2 - 20){
+                    paddleY = self.view.frame.size.height/2 - 20;
+                }
                 // 6 Update position of paddle
                 paddle.position = CGPointMake(paddleX, paddleY);
             }
@@ -510,7 +527,12 @@ static NSString* paddleCategoryName = @"paddle";
         }
         
         else if(secondBody.categoryBitMask == PADDLE){
-            self.userPoints += 1;
+           // self.userPoints += 1;
+            
+            
+            float randomNumber = ( arc4random() % 2) -0.5;
+            NSLog(@"%f", randomNumber);
+            [firstBody applyAngularImpulse: randomNumber];
         }
         else {
             NSLog(@"ELSE");
@@ -610,6 +632,12 @@ static NSString* paddleCategoryName = @"paddle";
     self.isPaused = YES;
 }
 
+#pragma mark - points increment
+
+-(void)addPoints{
+    self.userPoints = self.userPoints + (1 * self.qtdShapes);
+}
+
 #pragma mark - update
 
 -(void)update:(CFTimeInterval)currentTime {
@@ -618,9 +646,20 @@ static NSString* paddleCategoryName = @"paddle";
         [waitingForTouch removeFromParent];
     }
     
-    if(self.gameStarted && self.qtdShapes <=0 && !self.isPaused){
-        [self gameOver];
+    
+    if(self.gameStarted){
+        if(self.qtdShapes <=0 && !self.isPaused){
+            [self gameOver];
+        }
+        
+        if(time>= 60){
+            time = 0;
+            [self addPoints];
+        }else{
+            time++;
+        }
     }
+    
     
     self.points_hud.text = [NSString stringWithFormat:@"Score: %li", (long)self.userPoints];
     self.balls_number.text = [NSString stringWithFormat:@"Number of balls: %li", (long)self.qtdShapes];
