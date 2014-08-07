@@ -43,6 +43,7 @@ static NSString* paddleCategoryName = @"paddle";
     
 }
 
+
 #pragma mark - init
 
 -(id)initWithSize:(CGSize)size {    
@@ -61,9 +62,9 @@ static NSString* paddleCategoryName = @"paddle";
         
         waitingForTouch = [[SKLabelNode alloc] initWithFontNamed:@"Chalkduster"];
         waitingForTouch.text = @"Tap when Ready!";
-        waitingForTouch.fontSize = 30;
+        waitingForTouch.fontSize = self.frame.size.height * 0.0292;
         waitingForTouch.position = CGPointMake(CGRectGetMidX(self.frame),
-                                       CGRectGetMidY(self.frame)-200);
+                                       CGRectGetMidY(self.frame)-self.frame.size.width * 0.2604);
         [waitingForTouch setFontColor:[SKColor blackColor]];
         
         SKAction *fadeOut = [SKAction fadeOutWithDuration:0.5f];
@@ -135,15 +136,15 @@ static NSString* paddleCategoryName = @"paddle";
     
     firstTouch = YES;
     
-    self.paddleHeight = 20;
-    self.paddleWidth = 180;
+    self.paddleHeight = self.frame.size.height * 0.0195;
+    self.paddleWidth = self.frame.size.width * 0.2343;
     self.userPoints = 0;
     
     
     self.points_hud = [[SKLabelNode alloc] initWithFontNamed:@"Chalkduster"];
     self.points_hud.text = [NSString stringWithFormat:@"Score: %li", (long)self.userPoints];
-    self.points_hud.fontSize = 30;
-    self.points_hud.position = CGPointMake(CGRectGetMidX(self.frame)-280, CGRectGetHeight(self.frame)-60);
+    self.points_hud.fontSize = self.frame.size.height * 0.0292;
+    self.points_hud.position = CGPointMake(CGRectGetMidX(self.frame)-self.frame.size.width * 0.342, CGRectGetHeight(self.frame)-self.frame.size.width * 0.1);
     
     [self.points_hud setFontColor:[SKColor blackColor]];
     self.points_hud.zPosition = 2;
@@ -152,9 +153,9 @@ static NSString* paddleCategoryName = @"paddle";
     
     self.balls_number = [[SKLabelNode alloc] initWithFontNamed:@"Chalkduster"];
     self.balls_number.text = [NSString stringWithFormat:@"Number of balls: %li", (long)self.qtdShapes];
-    self.balls_number.fontSize = 30;
+    self.balls_number.fontSize = self.frame.size.height * 0.0292;
     self.balls_number.position = CGPointMake(CGRectGetMidX(self.frame),
-                                           CGRectGetMidY(self.frame)*1/3 -50);
+                                           CGRectGetMidY(self.frame)*1/3 -self.frame.size.width * 0.0561);
     [self.balls_number setFontColor:[SKColor blackColor]];
     self.balls_number.zPosition = 0;
     
@@ -172,13 +173,13 @@ static NSString* paddleCategoryName = @"paddle";
     play_pause.name = @"Play_Pause";
     play_pause.text = @"Pause";
     play_pause.fontColor = [SKColor blackColor];
-    play_pause.fontSize = 30.0f;
+    play_pause.fontSize = self.frame.size.height * 0.0292;
     play_pause.zPosition = 3;
-    play_pause.position = CGPointMake(CGRectGetWidth(self.frame)-60, CGRectGetHeight(self.frame)-60);
+    play_pause.position = CGPointMake(CGRectGetMidX(self.frame)+self.frame.size.width * 0.342, CGRectGetHeight(self.frame)-self.frame.size.width * 0.1);
     
     [self addChild:play_pause];
     
-    pausePlaceholder = [[SKSpriteNode alloc] initWithColor:[SKColor clearColor] size:CGSizeMake(120, 120)];
+    pausePlaceholder = [[SKSpriteNode alloc] initWithColor:[SKColor clearColor] size:CGSizeMake(self.frame.size.width * 0.1562, self.frame.size.width * 0.1562)];
     pausePlaceholder.name = @"Play_Pause";
     pausePlaceholder.zPosition = 2;
     
@@ -207,7 +208,7 @@ static NSString* paddleCategoryName = @"paddle";
     
     [self addChild:paddle];
     
-    SKSpriteNode *placeholder = [[SKSpriteNode alloc] initWithColor:[SKColor clearColor] size:CGSizeMake(self.paddleWidth, self.paddleWidth)];
+    SKSpriteNode *placeholder = [[SKSpriteNode alloc] initWithColor:[SKColor clearColor] size:CGSizeMake(self.paddleWidth, self.paddleWidth / 2)];
     
     placeholder.name = @"mainPlaceholder";
     
@@ -254,7 +255,7 @@ static NSString* paddleCategoryName = @"paddle";
     [self addChild:paddle];
     
     
-    SKSpriteNode *placeholder = [[SKSpriteNode alloc] initWithColor:[SKColor clearColor] size:CGSizeMake(self.paddleWidth, self.paddleWidth)];
+    SKSpriteNode *placeholder = [[SKSpriteNode alloc] initWithColor:[SKColor clearColor] size:CGSizeMake(self.paddleWidth, self.paddleWidth / 2)];
     
     placeholder.name = @"secondaryPlaceholder";
     
@@ -274,7 +275,7 @@ static NSString* paddleCategoryName = @"paddle";
     SKShapeNode *shape = [[SKShapeNode alloc] init];
     
     CGMutablePathRef myPath = CGPathCreateMutable();
-    CGPathAddArc(myPath, NULL, 0, 0, 30, 0, M_PI*2, YES);
+    CGPathAddArc(myPath, NULL, 0, 0, self.frame.size.width * 0.0390, 0, M_PI*2, YES);
     
     shape.path = myPath;
     
@@ -284,9 +285,9 @@ static NSString* paddleCategoryName = @"paddle";
     CGFloat brightness = ( arc4random() % 128 / 256.0 ) + 0.5;  //  0.5 to 1.0, away from black
     shape.fillColor = [SKColor colorWithHue:hue saturation:saturation brightness:brightness alpha:1];
     
-    shape.position = CGPointMake((100 + arc4random() % (700 - 100 + 1)), 900);
+    shape.position = CGPointMake((self.frame.size.width * 0.1302 + arc4random() % (int)(self.frame.size.width * 0.9114 - self.frame.size.width * 0.1302 + 1)), self.frame.size.width * 1.1718);
     
-    shape.physicsBody = [SKPhysicsBody bodyWithCircleOfRadius:30];
+    shape.physicsBody = [SKPhysicsBody bodyWithCircleOfRadius:self.frame.size.width * 0.0390];
     
     shape.physicsBody.dynamic = YES;
     
@@ -312,8 +313,8 @@ static NSString* paddleCategoryName = @"paddle";
 -(void)addGround{
     
     SKShapeNode *ground = [[SKShapeNode alloc] init];
-    NSInteger groundWidth = self.view.frame.size.width;
-    NSInteger groundHeight = 25;
+    NSInteger groundWidth = self.frame.size.width;
+    NSInteger groundHeight = self.frame.size.height * 0.0244;
     
     CGMutablePathRef myPath = CGPathCreateMutable();
     CGPathAddRect(myPath, NULL, CGRectMake(-(groundWidth/2), -(groundHeight/2), groundWidth, groundHeight));
@@ -340,7 +341,7 @@ static NSString* paddleCategoryName = @"paddle";
     SKTexture *texture1 = [SKTexture textureWithImageNamed:@"spikes.png"];
     groundTexture = [SKSpriteNode spriteNodeWithTexture:texture1];
     groundTexture.position = CGPointMake(ground.position.x - groundWidth/2, ground.position.y);
-    groundTexture.size = CGSizeMake(groundWidth, 50);
+    groundTexture.size = CGSizeMake(groundWidth, self.frame.size.width * 0.0651);
     
     [ground addChild:groundTexture];
     
@@ -372,14 +373,14 @@ static NSString* paddleCategoryName = @"paddle";
                 //            NSLog(@"Began touch on main paddle");
                 self.isFingerOnPaddle = YES;
                 NSLog(@"%f, %f",self.mainPlaceholder.size.height, self.mainPlaceholder.size.width);
-                self.mainPlaceholder.size = CGSizeMake(220, 200);
+                self.mainPlaceholder.size = CGSizeMake( self.frame.size.width * 0.2864, self.frame.size.width * 0.2604);
                 
                 
             }else if([aux.name isEqualToString:@"secondaryPaddle"] || [aux.name isEqualToString:@"secondaryPlaceholder"]){
                 //            NSLog(@"Began touch on secondary paddle");
                 self.isFinderOnSecondaryPaddle = YES;
                 NSLog(@"%f, %f",self.secondaryPlaceholder.size.height, self.secondaryPlaceholder.size.width);
-                self.secondaryPlaceholder.size = CGSizeMake(220, 200);
+                self.secondaryPlaceholder.size = CGSizeMake(self.frame.size.width * 0.2864, self.frame.size.width * 0.2604);
                 
                 
             }else if([aux.name isEqualToString:@"Play Again"]){
@@ -424,11 +425,11 @@ static NSString* paddleCategoryName = @"paddle";
                 int paddleX = paddle.position.x + (touchLocation.x - previousLocation.x);
                 int paddleY = paddle.position.y + (touchLocation.y - previousLocation.y);
                 // 5 verify if the position is allowed
-                if(paddleX < self.view.frame.size.width/2 + 90){
-                    paddleX = self.view.frame.size.width/2 + 90;
+                if(paddleX < self.frame.size.width/2 + self.paddleWidth/2){
+                    paddleX = self.frame.size.width/2 + self.paddleWidth/2;
                 }
-                if(paddleY > self.view.frame.size.height/2 - 20){
-                    paddleY = self.view.frame.size.height/2 - 20;
+                if(paddleY > self.frame.size.height/2 - self.paddleHeight/2){
+                    paddleY = self.frame.size.height/2 - self.paddleHeight/2;
                 }
                 
                 // 6 Update position of paddle
@@ -448,11 +449,11 @@ static NSString* paddleCategoryName = @"paddle";
                 int paddleX = paddle.position.x + (touchLocation.x - previousLocation.x);
                 int paddleY = paddle.position.y + (touchLocation.y - previousLocation.y);
                 // 5 verify if the position is allowed
-                if(paddleX > self.view.frame.size.width/2 - 90){
-                    paddleX = self.view.frame.size.width/2 - 90;
+                if(paddleX > self.frame.size.width/2 - self.paddleWidth/2){
+                    paddleX = self.frame.size.width/2 - self.paddleWidth/2;
                 }
-                if(paddleY > self.view.frame.size.height/2 - 20){
-                    paddleY = self.view.frame.size.height/2 - 20;
+                if(paddleY > self.frame.size.height/2 - self.paddleHeight/2){
+                    paddleY = self.frame.size.height/2 - self.paddleHeight/2;
                 }
                 // 6 Update position of paddle
                 paddle.position = CGPointMake(paddleX, paddleY);
@@ -476,12 +477,13 @@ static NSString* paddleCategoryName = @"paddle";
     SKNode *node = [self nodeAtPoint:currentPosition];
     if([node.name isEqualToString:@"mainPaddle"] || [node.name isEqualToString:@"mainPlaceholder"]){
         self.isFingerOnPaddle = NO;
-        self.mainPlaceholder.size = CGSizeMake(180, 180);
+        self.mainPlaceholder.size = CGSizeMake(self.paddleWidth, self.paddleWidth / 2);
         NSLog(@"main");
         
-    }else if([node.name isEqualToString:@"secondaryPaddle"] || [node.name isEqualToString:@"secondaryPlaceholder"]){
+    }
+    if([node.name isEqualToString:@"secondaryPaddle"] || [node.name isEqualToString:@"secondaryPlaceholder"]){
         self.isFinderOnSecondaryPaddle = NO;
-        self.secondaryPlaceholder.size = CGSizeMake(180, 180);
+        self.secondaryPlaceholder.size = CGSizeMake(self.paddleWidth, self.paddleWidth / 2);
         NSLog(@"secondary");
         
     }
@@ -530,8 +532,9 @@ static NSString* paddleCategoryName = @"paddle";
            // self.userPoints += 1;
             
             
-            float randomNumber = ( arc4random() % 2) -0.5;
+            float randomNumber = ( arc4random() % 2) -0.6;
             NSLog(@"%f", randomNumber);
+            
             [firstBody applyAngularImpulse: randomNumber];
         }
         else {
@@ -555,8 +558,8 @@ static NSString* paddleCategoryName = @"paddle";
 //    NSLog(@"ASDASD");
 
     if(!self.backNode){
-        self.backNode = [[SKSpriteNode alloc] initWithColor:[SKColor blackColor] size:CGSizeMake(self.view.frame.size.width, self.view.frame.size.height)];
-        self.backNode.position = CGPointMake(self.view.frame.size.width/2, self.view.frame.size.height/2);
+        self.backNode = [[SKSpriteNode alloc] initWithColor:[SKColor blackColor] size:CGSizeMake(self.frame.size.width, self.frame.size.height)];
+        self.backNode.position = CGPointMake(self.frame.size.width/2, self.frame.size.height/2);
         self.backNode.zPosition = 1;
         self.backNode.alpha = 0.5;
     }
@@ -569,40 +572,51 @@ static NSString* paddleCategoryName = @"paddle";
     
     [self removeAllActions];
     
+    
+    
+    NSLog(@"First Time>>%ld",(long)[[NSUserDefaults standardUserDefaults] integerForKey:@"firstTimePlaying"]);
+  //  if([[NSUserDefaults standardUserDefaults] integerForKey:@"firstTimePlaying"] == 0){
+        
+        [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:@"firstTimePlaying"];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"firstTimePlaying" object:nil userInfo:nil];
+    //}
+    
+    
     gameOverLabel = [[SKLabelNode alloc] initWithFontNamed:@"Chalkduster"];
     gameOverLabel.text = @"Game Over";
-    gameOverLabel.fontSize = 50;
+    gameOverLabel.fontSize = self.frame.size.width * 0.0651;
     gameOverLabel.zPosition = 2;
     gameOverLabel.position = CGPointMake(CGRectGetMidX(self.frame),
-                                         CGRectGetMidY(self.frame)/2 +500);
+                                         CGRectGetMidY(self.frame)/2 + self.frame.size.width * 0.6510);
     [gameOverLabel setFontColor:[SKColor redColor]];
     
     
     playAgainLabel = [[SKLabelNode alloc] initWithFontNamed:@"Chalkduster"];
     playAgainLabel.text = @"Play Again";
     playAgainLabel.name = playAgainLabel.text;
-    playAgainLabel.fontSize = 30;
+    playAgainLabel.fontSize = self.frame.size.height * 0.0292;
     playAgainLabel.zPosition = 2;
-    playAgainLabel.position = CGPointMake(0, -100);
+    playAgainLabel.position = CGPointMake(0, -self.frame.size.width * 0.1362);
     
     scoreLabel = [[SKLabelNode alloc] initWithFontNamed:@"Chalkduster"];
     scoreLabel.text = [NSString stringWithFormat:@"Score: %ld", (long)self.userPoints];
-    scoreLabel.fontSize = 20;
+    scoreLabel.fontSize = self.frame.size.height * 0.0195;
     scoreLabel.zPosition = 2;
-    scoreLabel.position = CGPointMake(0, -200);
+    scoreLabel.position = CGPointMake(0, -self.frame.size.width * 0.2604);
     
     NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
     NSInteger bestScore = [prefs integerForKey:@"bestScore"];
     if(bestScore<self.userPoints){
         bestScore = self.userPoints;
         [prefs setInteger:self.userPoints forKey:@"bestScore"];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"reportScore" object:nil userInfo:nil];
     }
     
     highScoreLabel = [[SKLabelNode alloc] initWithFontNamed:@"Chalkduster"];
     highScoreLabel.text =[NSString stringWithFormat:@"High Score: %li", (long)bestScore];
-    highScoreLabel.fontSize = 20;
+    highScoreLabel.fontSize = self.frame.size.height * 0.0195;
     highScoreLabel.zPosition = 2;
-    highScoreLabel.position = CGPointMake(0, -50);
+    highScoreLabel.position = CGPointMake(0, -self.frame.size.width * 0.0651);
     
     
     
@@ -629,6 +643,7 @@ static NSString* paddleCategoryName = @"paddle";
     NSLog(@"GAME OVER!");
    // [self.view setPaused:YES];
     [play_pause setHidden:YES];
+    [self.points_hud setHidden:YES];
     self.isPaused = YES;
 }
 
@@ -681,7 +696,7 @@ static NSString* paddleCategoryName = @"paddle";
     goBackToMenu = [[SKLabelNode alloc] initWithFontNamed:@"Chalkduster"];
     goBackToMenu.name = @"Back To Menu";
     goBackToMenu.text = @"Back to Menu";
-    goBackToMenu.fontSize = 30.0f;
+    goBackToMenu.fontSize = self.frame.size.height * 0.0292;
     goBackToMenu.fontColor = [SKColor whiteColor];
     goBackToMenu.position = CGPointMake(CGRectGetMidX(self.frame), CGRectGetMidY(self.frame));
     goBackToMenu.zPosition = 2;
@@ -690,22 +705,24 @@ static NSString* paddleCategoryName = @"paddle";
     
     scoreLabel = [[SKLabelNode alloc] initWithFontNamed:@"Chalkduster"];
     scoreLabel.text = [NSString stringWithFormat:@"Score: %ld", (long)self.userPoints];
-    scoreLabel.fontSize = 20;
+    scoreLabel.fontSize = self.frame.size.height * 0.0195;
     scoreLabel.zPosition = 2;
-    scoreLabel.position = CGPointMake(0, -200);
+    scoreLabel.position = CGPointMake(0, -self.frame.size.width * 0.2604);
     
     NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
     NSInteger bestScore = [prefs integerForKey:@"bestScore"];
     if(bestScore<self.userPoints){
         bestScore = self.userPoints;
         [prefs setInteger:self.userPoints forKey:@"bestScore"];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"reportScore" object:nil userInfo:nil];
+
     }
     
     highScoreLabel = [[SKLabelNode alloc] initWithFontNamed:@"Chalkduster"];
     highScoreLabel.text =[NSString stringWithFormat:@"High Score: %li", (long)bestScore];
-    highScoreLabel.fontSize = 20;
+    highScoreLabel.fontSize = self.frame.size.height * 0.0195;
     highScoreLabel.zPosition = 2;
-    highScoreLabel.position = CGPointMake(0, -50);
+    highScoreLabel.position = CGPointMake(0, -self.frame.size.width * 0.0651);
     
     [goBackToMenu addChild:scoreLabel];
     [scoreLabel addChild:highScoreLabel];

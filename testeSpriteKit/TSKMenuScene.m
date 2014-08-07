@@ -8,6 +8,7 @@
 
 #import "TSKMenuScene.h"
 #import "TSKMyScene.h"
+#import "TSKViewController.h"
 
 @interface TSKMenuScene()
 
@@ -21,6 +22,7 @@
 }
 
 -(id)initWithSize:(CGSize)size {
+    
     if (self = [super initWithSize:size]) {
         
         self.backgroundColor = [SKColor colorWithRed:1-0.15 green:1-0.15 blue:1-0.3 alpha:1.0];
@@ -28,18 +30,10 @@
         play = [[SKLabelNode alloc] initWithFontNamed:@"Chalkduster"];
         play.text = @"Play";
         play.name = @"Play";
-        play.fontSize = 40;
+        play.fontSize = self.frame.size.width * 0.0520;
         play.position = CGPointMake(CGRectGetMidX(self.frame),
                                                CGRectGetMidY(self.frame));
         [play setFontColor:[SKColor blackColor]];
-        
-//        SKAction *fadeOut = [SKAction fadeOutWithDuration:1.0f];
-//        SKAction *fadeIn = [SKAction fadeInWithDuration:1.0f];
-//        SKAction *actionSequence = [SKAction sequence:@[fadeOut, fadeIn]];
-//        SKAction *repeat = [SKAction repeatActionForever:actionSequence];
-//        
-//        [play runAction:repeat];
-        
         
         [self addChild:play];
         
@@ -47,9 +41,9 @@
         highScore = [[SKLabelNode alloc] initWithFontNamed:@"Chalkduster"];
         highScore.text = [NSString stringWithFormat:@"High Score %ld", (long)[[NSUserDefaults standardUserDefaults] integerForKey:@"bestScore"]];
         highScore.name = @"High Score";
-        highScore.fontSize = 20;
+        highScore.fontSize = self.frame.size.width * 0.0260;
         highScore.position = CGPointMake(CGRectGetMidX(self.frame),
-                                    CGRectGetMidY(self.frame)-100);
+                                    CGRectGetMidY(self.frame)-self.frame.size.width * 0.1302);
         [highScore setFontColor:[SKColor blackColor]];
         
         [self addChild:highScore];
@@ -58,17 +52,14 @@
         
         
         name = [[SKLabelNode alloc] initWithFontNamed:@"Chalkduster"];
-        name.text = @"PLACEHOLDER - NOME";
+        name.text = @"Funny Bounce";
         name.name = @"Nome";
-        name.fontSize = 60;
+        name.fontSize = self.frame.size.width * 0.0781;
         name.position = CGPointMake(CGRectGetMidX(self.frame),
-                                    CGRectGetMidY(self.frame)+300);
+                                    CGRectGetMidY(self.frame)+self.frame.size.width * 0.2604);
         [self addChild:name];
         
-        
     }
-    
-    
     
     return self;
 }
@@ -105,8 +96,5 @@
             [highScore setHidden:!highScore.isHidden];
         }];
 }
-
-
-
 
 @end
