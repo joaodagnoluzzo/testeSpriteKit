@@ -8,6 +8,6 @@
 
 #import <SpriteKit/SpriteKit.h>
 
-@interface TSKMenuScene : SKScene
+@interface TSKMenuScene : SKScene <SKPhysicsContactDelegate>
 
 @end

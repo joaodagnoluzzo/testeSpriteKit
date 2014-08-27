@@ -146,7 +146,7 @@ static NSString* paddleCategoryName = @"paddle";
     self.points_hud = [[SKLabelNode alloc] initWithFontNamed:@"Chalkduster"];
     self.points_hud.text = [NSString stringWithFormat:@"Score: %li", (long)self.userPoints];
     self.points_hud.fontSize = self.frame.size.height * 0.0292;
-    self.points_hud.position = CGPointMake(CGRectGetMidX(self.frame)-self.frame.size.width * 0.342, CGRectGetHeight(self.frame)-self.frame.size.width * 0.1);
+    self.points_hud.position = CGPointMake(CGRectGetMidX(self.frame)-self.frame.size.width * 0.342, CGRectGetHeight(self.frame)-self.frame.size.width * 0.242);
     
     [self.points_hud setFontColor:[SKColor blackColor]];
     self.points_hud.zPosition = 2;
@@ -177,11 +177,11 @@ static NSString* paddleCategoryName = @"paddle";
     play_pause.fontColor = [SKColor blackColor];
     play_pause.fontSize = self.frame.size.height * 0.0292;
     play_pause.zPosition = 3;
-    play_pause.position = CGPointMake(CGRectGetMidX(self.frame)+self.frame.size.width * 0.342, CGRectGetHeight(self.frame)-self.frame.size.width * 0.1);
+    play_pause.position = CGPointMake(CGRectGetMidX(self.frame)+self.frame.size.width * 0.342, CGRectGetHeight(self.frame)-self.frame.size.width * 0.242);
     
     [self addChild:play_pause];
     
-    pausePlaceholder = [[SKSpriteNode alloc] initWithColor:[SKColor clearColor] size:CGSizeMake(self.frame.size.width * 0.1562, self.frame.size.width * 0.1562)];
+    pausePlaceholder = [[SKSpriteNode alloc] initWithColor:[SKColor clearColor] size:CGSizeMake(self.frame.size.width * 0.242, self.frame.size.width * 0.1562)]; //1562
     pausePlaceholder.name = @"Play_Pause";
     pausePlaceholder.zPosition = 2;
     

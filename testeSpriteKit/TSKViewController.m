@@ -34,7 +34,7 @@
     [self addScoreAndAchievementsObserversForNotifications];
     
     //Banner
-    self.bannerView = [[GADBannerView alloc] initWithAdSize:kGADAdSizeBanner];
+    self.bannerView = [[GADBannerView alloc] initWithAdSize:kGADAdSizeSmartBannerPortrait];
     self.bannerView.adUnitID = @"ca-app-pub-9301633654568340/2806352712";
     self.bannerView.rootViewController = self;
     [self.view addSubview:self.bannerView];

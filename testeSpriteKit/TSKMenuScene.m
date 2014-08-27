@@ -10,7 +10,18 @@
 #import "TSKMyScene.h"
 #import "TSKViewController.h"
 
+static const uint32_t WORLD = 0x1 << 0;
+static const uint32_t GROUND = 0x1 << 1;
+static const uint32_t SHAPE = 0x1 << 2;
+static const uint32_t PADDLE = 0x1 << 3;
+
+static NSString* shapeCategoryName = @"shape";
+static NSString* paddleCategoryName = @"paddle";
+
 @interface TSKMenuScene()
+
+@property NSMutableArray *balls;
+@property int lastShape;
 
 @end
 
@@ -34,6 +45,7 @@
         play.position = CGPointMake(CGRectGetMidX(self.frame),
                                                CGRectGetMidY(self.frame));
         [play setFontColor:[SKColor blackColor]];
+        play.zPosition = 2;
         
         [self addChild:play];
         
@@ -45,6 +57,7 @@
         highScore.position = CGPointMake(CGRectGetMidX(self.frame),
                                     CGRectGetMidY(self.frame)-self.frame.size.width * 0.1302);
         [highScore setFontColor:[SKColor blackColor]];
+        highScore.zPosition = 2;
         
         [self addChild:highScore];
     
@@ -57,8 +70,37 @@
         name.fontSize = self.frame.size.width * 0.0781;
         name.position = CGPointMake(CGRectGetMidX(self.frame),
                                     CGRectGetMidY(self.frame)+self.frame.size.width * 0.2604);
+        name.zPosition = 2;
+        
         [self addChild:name];
         
+        
+        SKAction *wait = [SKAction waitForDuration:4];
+        SKAction *action = [SKAction performSelector:@selector(addShapes) onTarget:self];
+        SKAction *sequence = [SKAction sequence:@[wait, action]];
+        SKAction *repeat = [SKAction repeatAction:sequence count:6];
+        [self runAction:repeat completion:^{
+            SKAction *wait4reanimate = [SKAction waitForDuration:3];
+            SKAction *resetPosition = [SKAction performSelector:@selector(resetPositions) onTarget:self];
+            SKAction *animateAgain = [SKAction sequence:@[wait4reanimate, resetPosition]];
+            SKAction *repeat4ever = [SKAction repeatActionForever:animateAgain];
+            
+            [self runAction:repeat4ever];
+        }];
+        
+        
+        self.physicsWorld.contactDelegate = self;
+        
+        self.physicsBody.categoryBitMask = WORLD;
+        //NSLog(@"%u", self.physicsBody.categoryBitMask);
+        
+        self.physicsBody.collisionBitMask = SHAPE | GROUND;
+        self.physicsBody.contactTestBitMask = SHAPE;
+        
+        self.physicsBody = [SKPhysicsBody bodyWithEdgeLoopFromRect:self.frame];
+        
+        self.balls = [[NSMutableArray alloc] init];
+        self.lastShape = 0;
     }
     
     return self;
@@ -96,5 +138,51 @@
             [highScore setHidden:!highScore.isHidden];
         }];
 }
+
+-(void)resetPositions{
+    if(self.lastShape<5){
+        [[self.balls objectAtIndex:self.lastShape] setPosition:CGPointMake((self.frame.size.width * 0.1302 + arc4random() % (int)(self.frame.size.width * 0.9114 - self.frame.size.width * 0.1302 + 1)), self.frame.size.width * 1.1718)];
+        self.lastShape++;
+    }else{
+        self.lastShape=0;
+    }
+}
+
+-(void)addShapes{
+    
+    SKShapeNode *shape = [[SKShapeNode alloc] init];
+    
+    CGMutablePathRef myPath = CGPathCreateMutable();
+    CGPathAddArc(myPath, NULL, 0, 0, self.frame.size.width * 0.0390, 0, M_PI*2, YES);
+    
+    shape.path = myPath;
+    
+    //Random Color
+    CGFloat hue = ( arc4random() % 256 / 256.0 );  //  0.0 to 1.0
+    CGFloat saturation = ( arc4random() % 128 / 256.0 ) + 0.5;  //  0.5 to 1.0, away from white
+    CGFloat brightness = ( arc4random() % 128 / 256.0 ) + 0.5;  //  0.5 to 1.0, away from black
+    shape.fillColor = [SKColor colorWithHue:hue saturation:saturation brightness:brightness alpha:1];
+    
+    shape.position = CGPointMake((self.frame.size.width * 0.1302 + arc4random() % (int)(self.frame.size.width * 0.9114 - self.frame.size.width * 0.1302 + 1)), self.frame.size.width * 1.1718);
+    
+    shape.physicsBody = [SKPhysicsBody bodyWithCircleOfRadius:self.frame.size.width * 0.0390];
+    
+    shape.physicsBody.dynamic = YES;
+    
+    shape.name = shapeCategoryName;
+    shape.strokeColor = [SKColor blackColor];
+    
+    shape.physicsBody.categoryBitMask = SHAPE;
+    shape.physicsBody.collisionBitMask = SHAPE| PADDLE | GROUND;
+    shape.physicsBody.contactTestBitMask = SHAPE | GROUND | PADDLE ;
+    
+    shape.physicsBody.restitution = 1.00001; //bouncing
+    shape.physicsBody.linearDamping = 0; //reduces linear velocity
+    shape.physicsBody.velocity = CGVectorMake(0, -10);
+    
+    [self addChild:shape];
+    [self.balls addObject:shape];
+}
+
 
 @end
