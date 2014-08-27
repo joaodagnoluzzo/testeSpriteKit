@@ -24,7 +24,7 @@ static NSString* paddleCategoryName = @"paddle";
 @property (nonatomic) BOOL isFingerOnPaddle;
 @property (nonatomic) BOOL isFinderOnSecondaryPaddle;
 @property (nonatomic) BOOL gameStarted, isPaused;
-@property NSInteger paddleHeight, paddleWidth, qtdShapes, userPoints;
+@property NSInteger paddleHeight, paddleWidth, qtdShapes, userPoints, numDeaths;
 @property SKLabelNode *points_hud, *balls_number;
 @property SKShapeNode *mainPaddle, *secondaryPaddle;
 @property SKSpriteNode *mainPlaceholder, *secondaryPlaceholder, *backNode;
@@ -48,7 +48,9 @@ static NSString* paddleCategoryName = @"paddle";
 
 -(id)initWithSize:(CGSize)size {    
     if (self = [super initWithSize:size]) {
+        
         /* Setup your scene here */
+        self.numDeaths=1;
         
         firstTouch = NO;
         self.gameStarted = NO;
@@ -645,6 +647,17 @@ static NSString* paddleCategoryName = @"paddle";
     [play_pause setHidden:YES];
     [self.points_hud setHidden:YES];
     self.isPaused = YES;
+    
+    
+    if(self.numDeaths>=3){
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"interstitialBanner"
+                                                            object:nil
+                                                          userInfo:nil];
+        self.numDeaths=1;
+    }else{
+        self.numDeaths++;
+    }
+    
 }
 
 #pragma mark - points increment

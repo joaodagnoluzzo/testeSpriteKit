@@ -8,6 +8,9 @@
 
 #import "TSKViewController.h"
 #import "TSKMenuScene.h"
+#import "GADBannerView.h"
+#import "GADInterstitial.h"
+
 
 
 @interface TSKViewController()
@@ -15,6 +18,8 @@
 @property (nonatomic) BOOL gameCenterEnabled;
 @property (nonatomic, strong) NSString *leaderboardIdentifier;
 @property NSMutableDictionary *achievementsDescDictionary;
+@property GADBannerView *bannerView;
+@property GADInterstitial *interstitialBanner;
 
 @end
 
@@ -27,6 +32,26 @@
     [super viewDidLoad];
     [self authenticateLocalPlayer];
     [self addScoreAndAchievementsObserversForNotifications];
+    
+    //Banner
+    self.bannerView = [[GADBannerView alloc] initWithAdSize:kGADAdSizeBanner];
+    self.bannerView.adUnitID = @"ca-app-pub-9301633654568340/2806352712";
+    self.bannerView.rootViewController = self;
+    [self.view addSubview:self.bannerView];
+
+    GADRequest *request = [GADRequest request];
+    request.testDevices = [NSArray arrayWithObjects: GAD_SIMULATOR_ID, nil];
+    [self.bannerView loadRequest:request];
+    
+    
+    
+    [self loadInterstitialBanner];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(presentInterstitialBanner)
+                                                 name:@"interstitialBanner"
+                                               object:nil];
+    
+    
 }
 
 - (void)viewWillLayoutSubviews
@@ -61,6 +86,24 @@
 
 - (BOOL)prefersStatusBarHidden {
     return YES;
+}
+
+-(void)loadInterstitialBanner{
+    GADRequest *request = [GADRequest request];
+    request.testDevices = [NSArray arrayWithObjects: GAD_SIMULATOR_ID, nil];
+    [self.bannerView loadRequest:request];
+    
+    //Interstitial
+    self.interstitialBanner = [[GADInterstitial alloc] init];
+    self.interstitialBanner.adUnitID = @"ca-app-pub-9301633654568340/8992487112";
+    [self.interstitialBanner loadRequest:request];
+}
+
+-(void)presentInterstitialBanner{
+    
+    [self.interstitialBanner presentFromRootViewController:self];
+    [self loadInterstitialBanner];
+    
 }
 
 -(void)presentMenu{
@@ -197,12 +240,11 @@
                  for (GKAchievementDescription* a in descriptions) {
                      [self.achievementsDescDictionary setObject: a forKey: a.identifier];
                      [a loadImageWithCompletionHandler:^(UIImage *image, NSError *error) {
-                         if (error != nil) {
+                         if (image) {
                              NSLog(@"Não carreguei a imagem!");
                          }
-                         NSLog(@"%f",image.size.height);
+                         NSLog(@"Carreguei a imagem");
                      }];
-                     
                  }
              }
          }
